@@ -12,6 +12,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    open: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
@@ -29,5 +30,10 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
+    },
   },
 })
