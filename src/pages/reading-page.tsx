@@ -8,6 +8,8 @@ import { useLocation } from "wouter";
 import { GoogleAd } from '@/components/ads/google-adsense';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { AuthProvider } from '@/hooks/use-auth';
 
 interface ReadingPageProps {
@@ -172,7 +174,7 @@ function ReadingPage({ reading, onAskQuestion }: ReadingPageProps) {
   );
 }
 
-export default function ReadingPageContainer() {
+function ReadingPageContent() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -181,13 +183,21 @@ export default function ReadingPageContainer() {
   const {
     data: reading,
     isLoading: isLoadingReading,
-    refetch: refetchReading,
+    error: readingError,
   } = useQuery({
     queryKey: ["reading", user?.uid],
     queryFn: async () => {
       if (!user?.uid) return null;
-      return apiRequest<BirthDetails>(`/api/readings/${user.uid}`);
+      try {
+        const response = await apiRequest<BirthDetails>(`/api/readings/${user.uid}`);
+        return response;
+      } catch (error) {
+        // If no reading found, redirect to home to submit birth details
+        setLocation('/');
+        return null;
+      }
     },
+    retry: 1,
   });
 
   // Ask question mutation
@@ -199,45 +209,41 @@ export default function ReadingPageContainer() {
         body: { question },
       });
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast({
+        title: "Question Sent",
+        description: "Your question has been submitted for AI analysis.",
+      });
+    },
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to ask question. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  // Handle authentication
-  if (!user) {
-    setLocation("/login");
-    return null;
-  }
+  const onAskQuestion = async (question: string) => {
+    await askQuestionMutation.mutateAsync(question);
+  };
 
-  // Handle loading state
   if (isLoadingReading) {
     return (
-      <div className="container mx-auto p-4">
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="animate-spin w-12 h-12 text-primary" />
       </div>
     );
   }
 
-  // Handle no reading
   if (!reading) {
     return (
-      <div className="container mx-auto p-4">
-        <Card>
-          <CardContent className="p-8">
-            <p className="text-center">No reading found. Please generate one first.</p>
-          </CardContent>
-        </Card>
+      <div className="container mx-auto p-4 text-center">
+        <h2 className="text-2xl font-bold mb-4">Complete Your Profile</h2>
+        <p className="mb-6">Please submit your birth details to get your personalized reading.</p>
+        <Button onClick={() => setLocation('/')}>
+          Submit Birth Details
+        </Button>
       </div>
     );
   }
@@ -245,33 +251,36 @@ export default function ReadingPageContainer() {
   const content = reading.content;
 
   return (
+    <ReadingPage 
+      reading={{
+        humanDesign: {
+          lifePurpose: content.lifePurpose,
+          type: content.type,
+          strategy: content.strategy,
+          authority: content.authority,
+          notSelfTheme: content.notSelfTheme,
+          profile: content.profile,
+        },
+        astrology: {
+          relationships: content.relationships,
+          career: content.career,
+          transits: content.transits,
+        },
+        numerology: {
+          personalYear: content.personalYear,
+          lifePathNumber: content.lifePathNumber,
+          destinyNumber: content.destinyNumber,
+        },
+      }}
+      onAskQuestion={onAskQuestion}
+    />
+  );
+}
+
+export default function ReadingPageContainer() {
+  return (
     <AuthProvider>
-      <ReadingPage 
-        reading={{
-          humanDesign: {
-            lifePurpose: content.lifePurpose,
-            type: content.type,
-            strategy: content.strategy,
-            authority: content.authority,
-            notSelfTheme: content.notSelfTheme,
-            profile: content.profile,
-          },
-          astrology: {
-            relationships: content.relationships,
-            career: content.career,
-            transits: content.transits,
-          },
-          numerology: {
-            personalYear: content.personalYear,
-            lifePathNumber: content.lifePathNumber,
-            destinyNumber: content.destinyNumber,
-          },
-        }}
-        onAskQuestion={async (question) => {
-          await askQuestionMutation.mutateAsync(question);
-          await refetchReading();
-        }}
-      />
+      <ReadingPageContent />
     </AuthProvider>
   );
 }
