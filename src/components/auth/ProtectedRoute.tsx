@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 
 type ProtectedRouteProps = {
@@ -15,13 +15,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   ...rest 
 }) => {
   const { isAuthenticated, loading } = useAuth();
-  const router = useRouter();
+  const [, navigate] = useRouter();
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push('/auth');
+      navigate('/auth');
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, navigate]);
 
   if (loading) {
     return (
