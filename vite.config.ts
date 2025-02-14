@@ -11,12 +11,23 @@ export default defineConfig({
     },
   },
   server: {
+    port: 3000,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },
-    historyApiFallback: true, // Add this line for client-side routing
+    historyApiFallback: {
+      index: '/index.html',
+      rewrites: [
+        { from: /^\/auth$/, to: '/index.html' },
+        { from: /^\/reading$/, to: '/index.html' },
+        { from: /^\/.*$/, to: '/index.html' },
+      ],
+    },
+  },
+  build: {
+    outDir: 'dist',
   },
 })
