@@ -48,11 +48,18 @@ export default function AuthPage() {
   });
 
   const onLogin = async (data: { username: string; password: string }) => {
-    await loginMutation.mutateAsync(data);
+    await loginMutation.mutateAsync({ 
+      email: data.username, 
+      password: data.password 
+    });
   };
 
   const onRegister = async (data: { username: string; email: string; password: string }) => {
-    await registerMutation.mutateAsync(data);
+    await registerMutation.mutateAsync({ 
+      username: data.username, 
+      email: data.email, 
+      password: data.password 
+    });
   };
 
   return (
