@@ -6,7 +6,9 @@
       "@/components/*": ["src/components/*"],
       "@/lib/*": ["src/lib/*"],
       "@/shared/*": ["src/shared/*"],
-      "@/auth/*": ["src/auth/*"]
+      "@/auth/*": ["src/auth/*"],
+      "@/pages/*": ["src/pages/*"],
+      "@shared/schema": ["src/shared/schema.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
