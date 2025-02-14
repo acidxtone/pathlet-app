@@ -17,5 +17,6 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    historyApiFallback: true, // Add this line for client-side routing
   },
 })
