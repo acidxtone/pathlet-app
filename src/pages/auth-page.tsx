@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertUserSchema } from "@shared/schema";
+import { insertUserSchema } from "@/shared/schema";
 import { Loader2 } from "lucide-react";
 
 export default function AuthPage() {
@@ -55,11 +55,7 @@ export default function AuthPage() {
   };
 
   const onRegister = async (data: { username: string; email: string; password: string }) => {
-    await registerMutation.mutateAsync({ 
-      username: data.username, 
-      email: data.email, 
-      password: data.password 
-    });
+    await registerMutation.mutateAsync(data);
   };
 
   return (

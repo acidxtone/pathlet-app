@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { type BirthDetails } from "@shared/schema";
+import { type BirthDetails } from "@/shared/schema"; // Update schema import to use correct path
 import { useLocation } from "wouter";
 import { GoogleAd } from '@/components/ads/google-adsense';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
