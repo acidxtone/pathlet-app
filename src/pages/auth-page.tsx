@@ -1,5 +1,5 @@
 import React from "react";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import {
   Card,
@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Loader2 } from "lucide-react";
 
-function AuthPageContent() {
+export default function AuthPage() {
   const { user, isAuthenticated, loading, loginMutation, registerMutation } = useAuth();
   const [location, setLocation] = useLocation();
 
@@ -177,13 +177,5 @@ function AuthPageContent() {
         {/* Optional decorative section */}
       </div>
     </div>
-  );
-}
-
-export default function AuthPage() {
-  return (
-    <AuthProvider>
-      <AuthPageContent />
-    </AuthProvider>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
-function HomePageContent() {
+export default function HomePage() {
   const { user, isAuthenticated, loading, logoutMutation } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -148,13 +148,5 @@ function HomePageContent() {
         </Card>
       </main>
     </div>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <AuthProvider>
-      <HomePageContent />
-    </AuthProvider>
   );
 }

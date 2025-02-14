@@ -10,7 +10,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { AuthProvider } from '@/hooks/use-auth';
 
 interface ReadingPageProps {
   reading: {
@@ -277,10 +276,4 @@ function ReadingPageContent() {
   );
 }
 
-export default function ReadingPageContainer() {
-  return (
-    <AuthProvider>
-      <ReadingPageContent />
-    </AuthProvider>
-  );
-}
+export default ReadingPageContent;
