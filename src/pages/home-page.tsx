@@ -1,4 +1,5 @@
-import { useAuth } from "@/hooks/use-auth";
+import React from "react";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,10 +13,24 @@ import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
-export default function HomePage() {
-  const { user, logoutMutation } = useAuth();
+function HomePageContent() {
+  const { user, isAuthenticated, loading, logoutMutation } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      setLocation('/auth');
+    }
+  }, [isAuthenticated, loading, setLocation]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const birthForm = useForm({
     resolver: zodResolver(insertBirthDetailsSchema),
@@ -51,6 +66,10 @@ export default function HomePage() {
     },
   });
 
+  const onSubmit = async (data: any) => {
+    await submitBirthDetails.mutateAsync(data);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
@@ -68,12 +87,7 @@ export default function HomePage() {
             <CardTitle>Enter Your Birth Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <form
-              onSubmit={birthForm.handleSubmit((data) =>
-                submitBirthDetails.mutate(data)
-              )}
-              className="space-y-4"
-            >
+            <form onSubmit={birthForm.handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input id="name" {...birthForm.register("name")} />
@@ -122,20 +136,25 @@ export default function HomePage() {
                   </p>
                 )}
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={submitBirthDetails.isPending}
-              >
-                {submitBirthDetails.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Button type="submit" disabled={submitBirthDetails.isPending}>
+                {submitBirthDetails.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting</>
+                ) : (
+                  "Get Your Reading"
                 )}
-                Get Your Reading
               </Button>
             </form>
           </CardContent>
         </Card>
       </main>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <AuthProvider>
+      <HomePageContent />
+    </AuthProvider>
   );
 }

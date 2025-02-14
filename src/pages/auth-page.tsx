@@ -1,4 +1,5 @@
-import { useAuth } from "@/hooks/use-auth";
+import React from "react";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import {
   Card,
@@ -16,9 +17,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Loader2 } from "lucide-react";
 
-export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+function AuthPageContent() {
+  const { user, isAuthenticated, loading, loginMutation, registerMutation } = useAuth();
   const [location, setLocation] = useLocation();
+
+  React.useEffect(() => {
+    if (!loading && isAuthenticated) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, loading, setLocation]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   const loginForm = useForm({
     resolver: zodResolver(
@@ -32,10 +47,13 @@ export default function AuthPage() {
     defaultValues: { username: "", email: "", password: "" },
   });
 
-  if (user && location === "/auth") {
-    setLocation("/");
-    return null;
-  }
+  const onLogin = async (data: { username: string; password: string }) => {
+    await loginMutation.mutateAsync(data);
+  };
+
+  const onRegister = async (data: { username: string; email: string; password: string }) => {
+    await registerMutation.mutateAsync(data);
+  };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -49,110 +67,105 @@ export default function AuthPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
-
               <TabsContent value="login">
-                <form
-                  onSubmit={loginForm.handleSubmit((data) =>
-                    loginMutation.mutate(data)
-                  )}
-                  className="space-y-4"
-                >
+                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-username">Username</Label>
-                    <Input
-                      id="login-username"
-                      {...loginForm.register("username")}
+                    <Input 
+                      id="login-username" 
+                      {...loginForm.register("username")} 
+                      placeholder="Enter your username" 
                     />
                     {loginForm.formState.errors.username && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {loginForm.formState.errors.username.message}
                       </p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      {...loginForm.register("password")}
+                    <Input 
+                      id="login-password" 
+                      type="password" 
+                      {...loginForm.register("password")} 
+                      placeholder="Enter your password" 
                     />
                     {loginForm.formState.errors.password && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {loginForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
                     disabled={loginMutation.isPending}
                   >
-                    {loginMutation.isPending && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {loginMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Logging in...</>
+                    ) : (
+                      "Login"
                     )}
-                    Login
                   </Button>
                 </form>
               </TabsContent>
-
               <TabsContent value="register">
-                <form
-                  onSubmit={registerForm.handleSubmit((data) =>
-                    registerMutation.mutate(data)
-                  )}
-                  className="space-y-4"
-                >
+                <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="register-username">Username</Label>
-                    <Input
-                      id="register-username"
-                      {...registerForm.register("username")}
+                    <Input 
+                      id="register-username" 
+                      {...registerForm.register("username")} 
+                      placeholder="Choose a username" 
                     />
                     {registerForm.formState.errors.username && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {registerForm.formState.errors.username.message}
                       </p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-email">Email</Label>
-                    <Input
-                      id="register-email"
-                      type="email"
-                      {...registerForm.register("email")}
+                    <Input 
+                      id="register-email" 
+                      type="email" 
+                      {...registerForm.register("email")} 
+                      placeholder="Enter your email" 
                     />
                     {registerForm.formState.errors.email && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {registerForm.formState.errors.email.message}
                       </p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-password">Password</Label>
-                    <Input
-                      id="register-password"
-                      type="password"
-                      {...registerForm.register("password")}
+                    <Input 
+                      id="register-password" 
+                      type="password" 
+                      {...registerForm.register("password")} 
+                      placeholder="Choose a password" 
                     />
                     {registerForm.formState.errors.password && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {registerForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
                     disabled={registerMutation.isPending}
                   >
-                    {registerMutation.isPending && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {registerMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Registering...</>
+                    ) : (
+                      "Register"
                     )}
-                    Register
                   </Button>
                 </form>
               </TabsContent>
@@ -160,37 +173,17 @@ export default function AuthPage() {
           </CardContent>
         </Card>
       </div>
-
-      <div className="hidden lg:flex flex-col justify-center p-12 bg-gradient-to-br from-primary/10 to-primary/5">
-        <h1 className="text-4xl font-bold mb-6">
-          Discover Your Life Purpose with Pathlet
-        </h1>
-        <p className="text-lg text-muted-foreground mb-8">
-          Unlock deep insights about your life path using a unique combination of Human
-          Design, Western Astrology, and Numerology, enhanced by AI-powered
-          guidance.
-        </p>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="p-4 rounded-lg bg-card">
-            <h3 className="font-semibold mb-2">Human Design</h3>
-            <p className="text-sm text-muted-foreground">
-              Understand your unique energetic blueprint
-            </p>
-          </div>
-          <div className="p-4 rounded-lg bg-card">
-            <h3 className="font-semibold mb-2">Astrology</h3>
-            <p className="text-sm text-muted-foreground">
-              Reveal your cosmic influences
-            </p>
-          </div>
-          <div className="p-4 rounded-lg bg-card">
-            <h3 className="font-semibold mb-2">Numerology</h3>
-            <p className="text-sm text-muted-foreground">
-              Decode your life's numerical patterns
-            </p>
-          </div>
-        </div>
+      <div className="hidden lg:block bg-muted">
+        {/* Optional decorative section */}
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <AuthProvider>
+      <AuthPageContent />
+    </AuthProvider>
   );
 }
