@@ -1,18 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Route, Redirect } from 'wouter';
+import { Navigate } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 
 type ProtectedRouteProps = {
-  path: string;
-  component: React.ComponentType<any>;
+  children: React.ReactNode;
 };
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  path, 
-  component: Component 
+  children 
 }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -24,15 +22,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  return (
-    <Route path={path}>
-      {(params) => 
-        isAuthenticated ? (
-          <Component {...params} />
-        ) : (
-          <Redirect to="/auth" />
-        )
-      }
-    </Route>
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" />;
+  }
+
+  return <>{children}</>;
+};
+
+export const withProtection = (Component: React.ComponentType<any>) => {
+  return (props: any) => (
+    <ProtectedRoute>
+      <Component {...props} />
+    </ProtectedRoute>
   );
 };
