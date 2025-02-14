@@ -1,35 +1,38 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'wouter';
+import React from 'react';
+import { Route, Redirect } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
+import { Loader2 } from 'lucide-react';
 
 type ProtectedRouteProps = {
-  component: React.ComponentType<any>;
   path: string;
+  component: React.ComponentType<any>;
 };
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  component: Component, 
-  path,
-  ...rest 
+  path, 
+  component: Component 
 }) => {
   const { isAuthenticated, loading } = useAuth();
-  const [, navigate] = useRouter();
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, loading, navigate]);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-blue-500"></div>
+        <Loader2 className="animate-spin w-12 h-12 text-primary" />
       </div>
     );
   }
 
-  return isAuthenticated ? <Component {...rest} /> : null;
+  return (
+    <Route path={path}>
+      {(params) => 
+        isAuthenticated ? (
+          <Component {...params} />
+        ) : (
+          <Redirect to="/auth" />
+        )
+      }
+    </Route>
+  );
 };
