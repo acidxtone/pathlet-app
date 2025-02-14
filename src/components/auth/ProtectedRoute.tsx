@@ -1,40 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser } from '@/lib/auth';
+import { useAuth } from '@/hooks/use-auth';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  component: React.ComponentType<any>;
+  path: string;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ component: Component, path, ...rest }: ProtectedRouteProps) {
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Attempt to get current user
-        await getCurrentUser();
-        setIsLoading(false);
-      } catch (error) {
-        // Redirect to login if not authenticated
-        router.replace('/auth');
-      }
-    };
+    if (!isAuthenticated) {
+      router.push('/auth');
+    }
+  }, [isAuthenticated, router]);
 
-    checkAuth();
-  }, [router]);
-
-  // Show a loading state while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
+  return isAuthenticated ? <Component {...rest} /> : null;
 }
