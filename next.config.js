@@ -2,9 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  experimental: {
-    serverActions: true,
-  },
   typescript: {
     ignoreBuildErrors: true
   },

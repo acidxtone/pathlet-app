@@ -11,4 +11,13 @@ export function useToast() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  return { toast, showToast };
+  const clearToast = () => {
+    setToast(null);
+  };
+
+  return { 
+    toast, 
+    showToast, 
+    clearToast 
+  };
+}
