@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { GoogleAd } from '@/components/ads/google-adsense';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AuthProvider } from '@/hooks/use-auth';
 
 interface ReadingPageProps {
   reading: {
@@ -34,10 +35,21 @@ interface ReadingPageProps {
 }
 
 function ReadingPage({ reading, onAskQuestion }: ReadingPageProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  const [, navigate] = useLocation();
+
+  React.useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [isAuthenticated, loading, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
-    return null; // or redirect to login
+    return null;
   }
 
   return (
@@ -233,31 +245,33 @@ export default function ReadingPageContainer() {
   const content = reading.content;
 
   return (
-    <ReadingPage 
-      reading={{
-        humanDesign: {
-          lifePurpose: content.lifePurpose,
-          type: content.type,
-          strategy: content.strategy,
-          authority: content.authority,
-          notSelfTheme: content.notSelfTheme,
-          profile: content.profile,
-        },
-        astrology: {
-          relationships: content.relationships,
-          career: content.career,
-          transits: content.transits,
-        },
-        numerology: {
-          personalYear: content.personalYear,
-          lifePathNumber: content.lifePathNumber,
-          destinyNumber: content.destinyNumber,
-        },
-      }}
-      onAskQuestion={async (question) => {
-        await askQuestionMutation.mutateAsync(question);
-        await refetchReading();
-      }}
-    />
+    <AuthProvider>
+      <ReadingPage 
+        reading={{
+          humanDesign: {
+            lifePurpose: content.lifePurpose,
+            type: content.type,
+            strategy: content.strategy,
+            authority: content.authority,
+            notSelfTheme: content.notSelfTheme,
+            profile: content.profile,
+          },
+          astrology: {
+            relationships: content.relationships,
+            career: content.career,
+            transits: content.transits,
+          },
+          numerology: {
+            personalYear: content.personalYear,
+            lifePathNumber: content.lifePathNumber,
+            destinyNumber: content.destinyNumber,
+          },
+        }}
+        onAskQuestion={async (question) => {
+          await askQuestionMutation.mutateAsync(question);
+          await refetchReading();
+        }}
+      />
+    </AuthProvider>
   );
 }
