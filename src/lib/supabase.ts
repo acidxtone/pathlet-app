@@ -1,11 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase project URL and anon key
-const supabaseUrl = 'https://swaswbpczjelajyetmkf.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3YXN3YnBjemplbGFqeWV0bWtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk0OTQ2NjcsImV4cCI6MjA1NTA3MDY2N30.78q-fFI0dz4cWd0EDZVjpTz9xTQdkhkbOcSEp4IXE-g';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('Missing Supabase configuration');
+}
 
 // Create a single supabase client for interacting with your database
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true
+  }
+});
 
 // Function to create a reading record
 export async function createReading(readingData: any) {
