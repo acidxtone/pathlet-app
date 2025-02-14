@@ -1,11 +1,13 @@
-import { useAuth } from "@/components/auth/auth-context";
+import React from 'react';
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { type BirthDetails } from "@shared/schema";
 import { useLocation } from "wouter";
-import React from 'react';
 import { GoogleAd } from '@/components/ads/google-adsense';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface ReadingPageProps {
   reading: {
@@ -32,6 +34,12 @@ interface ReadingPageProps {
 }
 
 function ReadingPage({ reading, onAskQuestion }: ReadingPageProps) {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return null; // or redirect to login
+  }
+
   return (
     <div className="container mx-auto p-4 space-y-4 pb-24 max-w-3xl">
       {/* Top Ad */}
