@@ -2,15 +2,35 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/hooks/*": ["src/hooks/*"],
+      "@/*": ["src/*"],
       "@/components/*": ["src/components/*"],
+      "@/hooks/*": ["src/hooks/*"],
       "@/lib/*": ["src/lib/*"],
-      "@/shared/*": ["src/shared/*"],
-      "@/auth/*": ["src/auth/*"],
       "@/pages/*": ["src/pages/*"],
-      "@shared/schema": ["src/shared/schema.ts"]
-    }
+      "@/shared/*": ["src/shared/*"],
+      "@shared/*": ["src/shared/*"]
+    },
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
