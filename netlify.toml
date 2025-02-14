@@ -4,19 +4,17 @@
 
 [build.environment]
   NODE_VERSION = "18.18.0"
-  NPM_FLAGS = "--legacy-peer-deps"
-  NODE_OPTIONS = "--max_old_space_size=4096"
+  NPM_VERSION = "9.5.1"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:;"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[context.production]
-  command = "npm run build"
-  publish = ".next"
-
-[context.production.environment]
-  NEXT_PUBLIC_SUPABASE_URL = "${NEXT_PUBLIC_SUPABASE_URL}"
-  NEXT_PUBLIC_SUPABASE_ANON_KEY = "${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
-  NEXTAUTH_SECRET = "${NEXTAUTH_SECRET}"

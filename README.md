@@ -1,82 +1,48 @@
-# Pathlet: Personal Insights Platform
+# Pathlet Client Application
 
 ## Overview
-Pathlet is a comprehensive personal insights application that integrates Astrology, Numerology, and Human Design to provide users with deep, personalized life guidance.
+Pathlet is a modern web application built with Next.js, Supabase, and React.
 
-## Features
-- 🔐 Secure Authentication
-- 🌟 Personalized Readings
-- 🔮 Multi-Dimensional Insights
-- 💬 Interactive Chat Interface
+## Prerequisites
+- Node.js 18.18.0
+- npm 
+- Supabase Account
 
-## Tech Stack
-- Next.js 14
-- React
-- Supabase
-- Tailwind CSS
-- TypeScript
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v16+)
-- npm or yarn
-
-### Installation
+## Environment Setup
 1. Clone the repository
-2. Install dependencies
-```bash
-npm install
-```
-
-3. Set up environment variables
-- Copy `.env.local.example` to `.env.local`
-- Fill in Supabase and authentication credentials
-
-### Running the Application
-```bash
-npm run dev
-```
-
-## Deployment
-Deployed on Vercel with automatic GitHub integrations
-
-## Vercel Deployment
-
-### Prerequisites
-- Vercel Account
-- GitHub Repository
-
-### Deployment Steps
-1. Connect your GitHub repository to Vercel
-2. Set Environment Variables in Vercel Dashboard:
+2. Copy `.env.example` to `.env.production`
+3. Fill in the required environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `NEXTAUTH_SECRET`
 
-### Automatic Deployments
-- Vercel will automatically deploy on every push to the `main` branch
-- Preview deployments are created for pull requests
+## Local Development
+```bash
+npm install
+npm run dev
+```
 
-### Troubleshooting
+## Build for Production
+```bash
+npm run build
+```
+
+## Deployment
+Deployed on Netlify with the following configuration:
+- Build Command: `npm run build`
+- Publish Directory: `.next`
+
+## Key Technologies
+- Next.js 14
+- React
+- Supabase
+- TailwindCSS
+- TypeScript
+
+## Troubleshooting
 - Ensure all environment variables are correctly set
-- Check build logs in Vercel dashboard
-- Verify Supabase and authentication configurations
-
-## Environment Variables
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXTAUTH_SECRET`
-
-## Contributing
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+- Check Netlify build logs for specific errors
+- Verify Node.js version compatibility
 
 ## License
-[Your License Here]
-
-## Contact
-[Your Contact Information]
+Proprietary - All Rights Reserved
