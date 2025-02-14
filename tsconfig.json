@@ -4,7 +4,9 @@
     "paths": {
       "@/hooks/*": ["src/hooks/*"],
       "@/components/*": ["src/components/*"],
-      "@/lib/*": ["src/lib/*"]
+      "@/lib/*": ["src/lib/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/auth/*": ["src/auth/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
