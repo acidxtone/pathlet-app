@@ -5,11 +5,16 @@
 [build.environment]
   NODE_VERSION = "18.18.0"
   NPM_FLAGS = "--legacy-peer-deps"
+  NODE_OPTIONS = "--max_old_space_size=4096"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[context.production]
+  command = "npm run build"
+  publish = ".next"
 
 [context.production.environment]
   NEXT_PUBLIC_SUPABASE_URL = "${NEXT_PUBLIC_SUPABASE_URL}"
