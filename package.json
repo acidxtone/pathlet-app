@@ -1,6 +1,6 @@
 {
-  "name": "pathlet-client",
-  "version": "0.1.0",
+  "name": "pathlet-self-discovery",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -22,8 +22,10 @@
     "@radix-ui/react-tabs": "^1.0.0",
     "@supabase/supabase-js": "^2.39.3",
     "@tanstack/react-query": "^5.17.6",
+    "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "framer-motion": "^11.0.3",
     "lucide-react": "^0.321.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -48,5 +50,13 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.11"
-  }
+  },
+  "description": "A self-discovery platform combining Astrology, Human Design, and Numerology",
+  "keywords": [
+    "self-discovery",
+    "astrology",
+    "human-design",
+    "numerology",
+    "personal-insights"
+  ]
 }
