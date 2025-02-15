@@ -1,83 +1,134 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { Session, User } from '@supabase/supabase-js';
+import { insertUserSchema } from '@/shared/schema';
+import { z } from 'zod';
 
-type AuthContextType = {
-  user: any | null;
+// Define authentication context type
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
   loading: boolean;
-};
+  loginMutation: ReturnType<typeof useLoginMutation>;
+  registerMutation: ReturnType<typeof useRegisterMutation>;
+  logoutMutation: ReturnType<typeof useLogoutMutation>;
+}
 
-const AuthContext = createContext<AuthContextType | null>(null);
+// Create authentication context
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any | null>(null);
+// Custom login mutation
+function useLoginMutation() {
+  return useMutation({
+    mutationFn: async ({ email, password }: { email: string; password: string }) => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onError: (error) => {
+      console.error('Login failed:', error.message);
+    },
+  });
+}
+
+// Custom register mutation
+function useRegisterMutation() {
+  return useMutation({
+    mutationFn: async (userData: z.infer<typeof insertUserSchema>) => {
+      const { username, email, password } = userData;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+          },
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onError: (error) => {
+      console.error('Registration failed:', error.message);
+    },
+  });
+}
+
+// Custom logout mutation
+function useLogoutMutation() {
+  return useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    },
+    onError: (error) => {
+      console.error('Logout failed:', error.message);
+    },
+  });
+}
+
+// Authentication provider component
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const loginMutation = useLoginMutation();
+  const registerMutation = useRegisterMutation();
+  const logoutMutation = useLogoutMutation();
+
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
+    // Get current session on mount
+    async function getSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    }
+
+    // Listen for authentication state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
         setUser(session?.user ?? null);
-      } catch (error) {
-        console.error('Error checking user session:', error);
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    checkUser();
+    getSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
+    // Cleanup subscription
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
 
-  const login = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   const value = {
     user,
+    session,
     isAuthenticated: !!user,
-    login,
-    logout,
-    loading
+    loading,
+    loginMutation,
+    registerMutation,
+    logoutMutation,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
 
-export const useAuth = () => {
+// Custom hook to use authentication context
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === null) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}
