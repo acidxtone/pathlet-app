@@ -14,7 +14,7 @@ class AuthenticationError extends Error {
 }
 
 // Define authentication context type with more robust typing
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAuthenticated: boolean;
@@ -121,24 +121,22 @@ function useLogoutMutation() {
 }
 
 // Authentication provider component
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Memoized mutations to prevent unnecessary re-renders
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
   const logoutMutation = useLogoutMutation();
 
-  // Callback to refresh session
   const refreshSession = useCallback(async () => {
     try {
-      const { data: { session: freshSession } } = await supabase.auth.getSession();
-      setSession(freshSession);
-      setUser(freshSession?.user ?? null);
+      const { data: { session: newSession } } = await supabase.auth.getSession();
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
     } catch (error) {
-      console.error('Session refresh failed', error);
+      console.error('Error refreshing session:', error);
       setUser(null);
       setSession(null);
     }
@@ -146,37 +144,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
-
-    // Get current session on mount
-    async function getSession() {
-      try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
-        if (isMounted) {
-          setSession(initialSession);
-          setUser(initialSession?.user ?? null);
-          setLoading(false);
-        }
-      } catch (error) {
-        if (isMounted) {
-          setLoading(false);
-        }
+    const authListener = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      if (isMounted) {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setLoading(false);
       }
-    }
+    });
 
-    // Listen for authentication state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (isMounted) {
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-        }
+    // Initial session check
+    const checkSession = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (isMounted) {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setLoading(false);
       }
-    );
+    };
 
-    getSession();
+    checkSession();
 
-    // Cleanup subscription
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();
