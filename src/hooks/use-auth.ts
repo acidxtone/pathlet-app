@@ -31,7 +31,7 @@ function useLoginMutation() {
       if (error) throw error;
       return data;
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Login failed:', error.message);
     },
   });
@@ -56,7 +56,7 @@ function useRegisterMutation() {
       if (error) throw error;
       return data;
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Registration failed:', error.message);
     },
   });
@@ -69,7 +69,7 @@ function useLogoutMutation() {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Logout failed:', error.message);
     },
   });
