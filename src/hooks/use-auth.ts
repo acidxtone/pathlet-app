@@ -184,7 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Memoized context value to prevent unnecessary re-renders
-  const value = useMemo(() => ({
+  const value: AuthContextType = useMemo(() => ({
     user,
     session,
     isAuthenticated: !!user,
@@ -196,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }), [user, session, loading, loginMutation, registerMutation, logoutMutation, refreshSession]);
 
   return (
-    <AuthContext.Provider value={value as AuthContextType}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
